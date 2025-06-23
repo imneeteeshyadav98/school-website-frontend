@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useState, useRef } from "react";
-import Image from "next/image";
-import { fetchGalleryItems } from "@/lib/fetchGalleryItems";
 import { GalleryItem } from "@/types/gallery";
+import Image from "next/image";
+import { useState, useEffect, useRef } from "react";
 
-export default function GalleryPage() {
-  const [items, setItems] = useState<GalleryItem[]>([]);
+type Props = {
+  items: GalleryItem[];
+};
+
+export default function GallerySection({ items }: Props) {
   const [filtered, setFiltered] = useState<GalleryItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -14,18 +16,9 @@ export default function GalleryPage() {
   const [lightbox, setLightbox] = useState<{ photos: string[]; index: number } | null>(null);
   const [page, setPage] = useState(1);
   const itemsPerPage = 8;
-  const [loading, setLoading] = useState(true);
 
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
   const touchStartX = useRef<number | null>(null);
-
-  useEffect(() => {
-    fetchGalleryItems().then((data) => {
-      const sorted = data.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-      setItems(sorted);
-      setLoading(false);
-    });
-  }, []);
 
   const categoryColorMap: Record<string, string> = {
     Sports: "bg-green-600",
@@ -144,54 +137,38 @@ export default function GalleryPage() {
         </div>
       )}
 
-      {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, idx) => (
-            <div key={idx} className="bg-gray-200 animate-pulse h-[250px] rounded shadow" />
-          ))}
-        </div>
-      ) : paginatedItems.length === 0 ? (
+      {paginatedItems.length === 0 ? (
         <p className="text-center text-gray-500">No gallery items available.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {paginatedItems.map((item) =>
-            item.photos.map((photo, idx) => (
-              <div
-                key={`${item.id}-${idx}`}
-                onClick={() => openLightbox(item.photos.map((p) => p.url), idx)}
-                className="bg-white rounded shadow overflow-hidden cursor-pointer group relative"
-              >
-                <div className="relative bg-white overflow-hidden group rounded">
-                  <div className="relative z-10">
-                    <Image
-                      src={photo.url}
-                      alt={photo.name || item.title}
-                      width={600}
-                      height={400}
-                      loading="lazy"
-                      className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="absolute inset-0 z-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition duration-300" />
-                  <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
-                    <span className="text-white text-3xl">🔍</span>
-                  </div>
-                  {item.tags && (Array.isArray(item.tags) ? item.tags.length > 0 : true) && (
-                    <span className="absolute top-2 left-2 z-30 bg-white text-xs text-black px-2 py-1 rounded-full shadow">
-                      {Array.isArray(item.tags) ? item.tags[0] : item.tags}
-                    </span>
-                  )}
-                </div>
-                <div className="p-2 bg-gray-900 text-white text-center text-sm truncate">
-                  {item.title}
-                </div>
+          {paginatedItems.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => openLightbox(item.photos.map((p) => p.url), 0)}
+              className="bg-white rounded shadow overflow-hidden cursor-pointer group relative hover:z-30"
+            >
+              <div className="aspect-[4/3] w-full relative bg-gray-100 rounded overflow-hidden group">
+                <Image
+                  src={item.photos[0]?.url || "/placeholder.jpg"}
+                  alt={item.photos[0]?.name || item.title}
+                  fill
+                  className="object-cover w-full h-full transition-all duration-300 group-hover:object-contain group-hover:scale-110 group-hover:z-40"
+                />
               </div>
-            ))
-          )}
+              {Array.isArray(item.tags) && item.tags.length > 0 && (
+                <span className="absolute top-2 left-2 z-30 bg-white text-xs text-black px-2 py-1 rounded-full shadow">
+                  {item.tags[0]}
+                </span>
+              )}
+              <div className="p-2 bg-gray-900 text-white text-center text-sm truncate">
+                {item.title}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
-      {!loading && filtered.length > page * itemsPerPage && (
+      {filtered.length > page * itemsPerPage && (
         <div className="flex justify-center mt-6">
           <button
             onClick={() => setPage((prev) => prev + 1)}

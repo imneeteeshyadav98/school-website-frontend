@@ -3,13 +3,17 @@ import AboutSection from "@/components/AboutSection";
 import ProgramSection from "@/components/ProgramSection";
 import CarouselVideoSection from "@/components/CarouselVideoSection";
 import ClientPrabandhakThoughts from "@/components/ClientPrabandhakThoughts"; // this should be the client wrapper component
+import { fetchGalleryItems } from "@/lib/fetchGalleryItems"; // ✅ Correct path if that's where you defined it
+import GallerySection from "@/components/GallerySection";
+import GalleryPreview from "@/components/GalleryPreview";
 
 export default async function HomePage() {
-  const [homepage, about, programs, topVideos] = await Promise.all([
+  const [homepage, about, programs, topVideos,galleryItems] = await Promise.all([
     fetchHomepage(),
     fetchAbout(),
     fetchPrograms(),
     fetchTopVideos(),
+    fetchGalleryItems(),
   ]);
 
   if (!homepage) {
@@ -69,6 +73,22 @@ export default async function HomePage() {
 
       {/* 🎓 Programs Section */}
       <ProgramSection programs={programs} />
+      {/* 🖼️ Gallery Section Preview */}
+{/* 🖼️ Gallery Preview */}
+{galleryItems && galleryItems.length > 0 && (
+  <section id="gallery-preview" className="scroll-mt-24 px-4">
+    <h2 className="text-2xl font-bold text-center mb-6">📷 Memories from Campus</h2>
+    <GalleryPreview items={galleryItems.slice(0, 4)} />
+    <div className="text-center mt-6">
+      <a
+        href="/gallery"
+        className="inline-block px-6 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition"
+      >
+        View Full Gallery
+      </a>
+    </div>
+  </section>
+)}
 
       {/* 🧠 About Section */}
       {about?.leftText && about?.rightText && (

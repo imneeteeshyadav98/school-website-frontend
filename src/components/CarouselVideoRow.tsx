@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { Autoplay, Navigation } from 'swiper/modules';
+import { useRef, useState } from 'react';
 import { Video } from '@/types/video';
 
 export default function CarouselVideoRow({
@@ -16,19 +16,6 @@ export default function CarouselVideoRow({
   videos: Video[];
   onSelect: (video: Video) => void;
 }) {
-  const [YTLoaded, setYTLoaded] = useState(false);
-
-  useEffect(() => {
-    if (!(window as any).YT) {
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      document.body.appendChild(tag);
-      (window as any).onYouTubeIframeAPIReady = () => setYTLoaded(true);
-    } else {
-      setYTLoaded(true);
-    }
-  }, []);
-
   const extractYouTubeId = (url: string): string | null => {
     try {
       const parsed = new URL(url);
@@ -41,18 +28,16 @@ export default function CarouselVideoRow({
 
   return (
     <section className="py-6 px-2">
-      <h3 className="text-xl font-semibold mb-2 px-2 text-gray-800">{title}</h3>
+      <h3 className="text-xl font-semibold mb-4 px-2 text-gray-800">{title}</h3>
 
       <div className="max-w-6xl mx-auto">
         <Swiper
           slidesPerView={1.2}
           spaceBetween={16}
           autoplay={{ delay: 4000 }}
-          centeredSlides
-          centeredSlidesBounds
           breakpoints={{
             640: { slidesPerView: 2.2 },
-            1024: { slidesPerView: 3 },
+            1024: { slidesPerView: 3.2 },
           }}
           navigation
           modules={[Autoplay, Navigation]}
@@ -63,80 +48,74 @@ export default function CarouselVideoRow({
             if (!id) return null;
 
             const thumbnail = video.thumbnail?.url || `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-            const playerRef = useRef<HTMLIFrameElement | null>(null);
+            const isNew =
+              video.publishedAt &&
+              Date.now() - new Date(video.publishedAt).getTime() < 7 * 24 * 60 * 60 * 1000;
 
-            const handleHover = () => {
-              if (!YTLoaded || !playerRef.current) return;
-              new (window as any).YT.Player(playerRef.current, {
-                events: {
-                  onReady: (event: any) => {
-                    event.target.unMute();
-                    event.target.playVideo();
-                  },
-                },
-              });
-            };
+            const [hovered, setHovered] = useState(false);
 
             return (
               <SwiperSlide key={video.id} className="overflow-visible">
                 <div className="relative group">
-                  <div className="relative rounded-lg overflow-hidden bg-white border border-gray-200 shadow transition-all duration-300 ease-in-out transform group-hover:z-50 group-hover:scale-105 group-hover:shadow-lg">
-                    <div
-                      className="relative w-full h-60 overflow-hidden cursor-pointer"
-                      onMouseEnter={handleHover}
-                    >
-                      {/* Thumbnail fallback */}
-                      <img
-                        src={thumbnail}
-                        alt={video.title}
-                        className="w-full h-full object-cover absolute inset-0 z-0 transition-opacity duration-300 group-hover:opacity-0"
-                      />
+                  <div
+                    onClick={() => onSelect(video)}
+                    onMouseEnter={() => setHovered(true)}
+                    onMouseLeave={() => setHovered(false)}
+                    className="relative rounded-lg overflow-hidden bg-white border border-gray-200 shadow-md hover:shadow-xl transform transition duration-300 cursor-pointer hover:scale-110 z-10"
+                  >
+                    {/* Thumbnail or autoplay preview */}
+                    <div className="relative w-full h-60 overflow-hidden bg-black">
+                      {hovered ? (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0`}
+                          title={video.title}
+                          className="absolute inset-0 w-full h-full"
+                          allow="autoplay; encrypted-media"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <img
+                          src={thumbnail}
+                          alt={video.title}
+                          className="w-full h-full object-cover transition-opacity duration-300"
+                        />
+                      )}
 
-                      {/* YouTube iframe preview */}
-                      <iframe
-                        ref={playerRef}
-                        title={video.title}
-                        className="absolute inset-0 w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"
-                        src={`https://www.youtube.com/embed/${id}?enablejsapi=1&controls=1&rel=0&modestbranding=1&autoplay=0`}
-                        allow="autoplay; encrypted-media"
-                        allowFullScreen
-                      />
-
-                      {/* Overlay controls */}
-                      <div className="absolute inset-0 flex justify-between items-start px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
-                        <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded-full">
-                          🔇 Muted Preview
-                        </span>
-                        <button
-                          onClick={() => onSelect(video)}
-                          className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded-full hover:bg-opacity-80 transition"
-                          title="Open Fullscreen"
-                        >
-                          ⛶
-                        </button>
-                      </div>
-
-                      {/* Play icon (centered) */}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                      {/* Play Icon Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <span className="text-white text-4xl bg-black bg-opacity-60 p-3 rounded-full">
                           ▶️
                         </span>
                       </div>
 
-                      {/* Progress bar */}
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 z-30">
-                        <div className="h-full bg-indigo-500 animate-[progress_5s_linear_infinite]" />
-                      </div>
-
                       {/* NEW badge */}
-                      <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded font-semibold tracking-wide shadow-md z-30">
-                        NEW
-                      </div>
+                      {isNew && (
+                        <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded font-semibold tracking-wide shadow-md z-30">
+                          NEW
+                        </div>
+                      )}
                     </div>
 
-                    {/* Video Title */}
-                    <div className="bg-gray-50 text-gray-800 px-3 py-2 text-sm truncate font-semibold">
-                      {video.title}
+                    {/* Info Panel */}
+                    <div className="bg-gray-50 text-gray-800 px-3 py-2 space-y-1">
+                      <p className="text-sm font-semibold truncate">{video.title}</p>
+                      <div className="flex flex-wrap gap-1 text-xs text-gray-600">
+                        {video.classLevel && (
+                          <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                            Class {video.classLevel}
+                          </span>
+                        )}
+                        {video.subject && (
+                          <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                            {video.subject}
+                          </span>
+                        )}
+                        {video.duration && (
+                          <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
+                            ⏱ {video.duration}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -145,17 +124,6 @@ export default function CarouselVideoRow({
           })}
         </Swiper>
       </div>
-
-      <style jsx>{`
-        @keyframes progress {
-          from {
-            width: 0%;
-          }
-          to {
-            width: 100%;
-          }
-        }
-      `}</style>
     </section>
   );
 }

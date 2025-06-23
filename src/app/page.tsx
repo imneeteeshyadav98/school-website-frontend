@@ -2,6 +2,7 @@ import { fetchHomepage, fetchAbout, fetchPrograms, fetchTopVideos } from "@/lib/
 import AboutSection from "@/components/AboutSection";
 import ProgramSection from "@/components/ProgramSection";
 import CarouselVideoSection from "@/components/CarouselVideoSection";
+import ClientPrabandhakThoughts from "@/components/ClientPrabandhakThoughts"; // this should be the client wrapper component
 
 export default async function HomePage() {
   const [homepage, about, programs, topVideos] = await Promise.all([
@@ -27,8 +28,8 @@ export default async function HomePage() {
     <main className="space-y-24 scroll-smooth">
       {/* 🎯 Hero Section */}
       <section className="max-w-5xl mx-auto px-4 py-12 text-center space-y-6">
-        <h1 className="text-4xl font-extrabold">{homepage.title}</h1>
-        <p className="text-gray-700 text-lg">{homepage.description}</p>
+        <h1 className="text-4xl font-extrabold text-gray-900">{homepage.title}</h1>
+        <p className="text-gray-700 text-lg max-w-3xl mx-auto">{homepage.description}</p>
         {imageUrl && (
           <div className="mx-auto max-w-3xl shadow-lg rounded overflow-hidden">
             <img
@@ -60,6 +61,11 @@ export default async function HomePage() {
       {topVideos && topVideos.length > 0 && (
         <CarouselVideoSection videos={topVideos} />
       )}
+
+      {/* 💬 प्रबंधक के विचार (Prabandhak Message Section) */}
+      <section id="prabandhak-thoughts" className="scroll-mt-24">
+        <ClientPrabandhakThoughts />
+      </section>
 
       {/* 🎓 Programs Section */}
       <ProgramSection programs={programs} />

@@ -50,18 +50,13 @@ export default function GalleryPage() {
   const nextPhoto = () => lightbox && lightbox.index < lightbox.photos.length - 1 && setLightbox({ ...lightbox, index: lightbox.index + 1 });
   const prevPhoto = () => lightbox && lightbox.index > 0 && setLightbox({ ...lightbox, index: lightbox.index - 1 });
 
-  // Auto slideshow for lightbox
   useEffect(() => {
     if (lightbox) {
       autoPlayRef.current = setInterval(() => {
         setLightbox((current) => {
           if (!current) return null;
           const nextIndex = current.index + 1;
-          if (nextIndex < current.photos.length) {
-            return { ...current, index: nextIndex };
-          } else {
-            return { ...current, index: 0 }; // loop to start
-          }
+          return { ...current, index: nextIndex < current.photos.length ? nextIndex : 0 };
         });
       }, 4000);
     } else {
@@ -72,7 +67,6 @@ export default function GalleryPage() {
     };
   }, [lightbox]);
 
-  // Swipe gesture support
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   };

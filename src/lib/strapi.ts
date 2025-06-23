@@ -371,7 +371,43 @@ export async function fetchProgramBySlug(slug: string) {
       return [];
     }
   }
+  export async function fetchPrabandhakThought() {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/prabandhak-thoughts?populate=photo`, {
+        cache: 'no-store',
+      });
   
+      console.log("📥 Prabandhak API response status:", res.status);
   
+      if (!res.ok) {
+        console.error("❌ Failed to fetch Prabandhak Thought:", res.statusText);
+        return null;
+      }
+  
+      const json = await res.json();
+      const thought = json?.data?.[0]; // ✅ your API directly returns fields here
+  
+      if (!thought) {
+        console.warn("⚠️ No Prabandhak data found.");
+        return null;
+      }
+  
+      // ✅ direct access, no attributes nesting
+      const photoPath = thought?.photo?.url ?? thought?.photo?.formats?.medium?.url;
+      const fullPhotoUrl = photoPath
+        ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${photoPath}`
+        : null;
+  
+      return {
+        name: thought.name ?? 'नाम नहीं मिला',
+        designation: thought.designation ?? 'पद नहीं मिला',
+        message: thought.message ?? '',
+        photoUrl: fullPhotoUrl,
+      };
+    } catch (error) {
+      console.error("❌ Error fetching Prabandhak Thought:", error);
+      return null;
+    }
+  }
   
   

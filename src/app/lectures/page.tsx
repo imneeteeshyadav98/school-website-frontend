@@ -1,22 +1,16 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { fetchVideoLectures } from '@/lib/strapi';
-import VideoLectureGrid from '@/components/VideoLectureGrid';
-import { Video } from '@/types/video';
-import SkeletonGrid from '@/components/SkeletonGrid'; // or ProgramCardSkeleton
+import { useEffect, useState } from "react";
+import { fetchVideoLectures } from "@/lib/strapi";
+import VideoLectureGrid from "@/components/VideoLectureGrid";
+import { Video } from "@/types/video";
+import SkeletonGrid from "@/components/SkeletonGrid";
 
 export default function LecturePage() {
   const [videos, setVideos] = useState<Video[]>([]);
-  const [filteredVideos, setFilteredVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // UI filter states
-  const [selectedClass, setSelectedClass] = useState('');
-  const [selectedSubject, setSelectedSubject] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Fetch videos on load
   useEffect(() => {
     const load = async () => {
       setLoading(true);
@@ -27,63 +21,43 @@ export default function LecturePage() {
     load();
   }, []);
 
-  // Apply filtering whenever filters or searchQuery changes
-  useEffect(() => {
-    const filtered = videos.filter((video) => {
-      const matchClass = selectedClass ? video.classLevel === selectedClass : true;
-      const matchSubject = selectedSubject ? video.subject === selectedSubject : true;
-      const matchSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchClass && matchSubject && matchSearch;
-    });
-    setFilteredVideos(filtered);
-  }, [videos, selectedClass, selectedSubject, searchQuery]);
+  // Filtering logic
+  const filtered = videos.filter((video) =>
+    video.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  // Extract dropdown options dynamically
-  const classOptions = [...new Set(videos.map((v) => v.classLevel))];
-  const subjectOptions = [...new Set(videos.map((v) => v.subject))];
+  // Group by class → subject
+  const groupedVideos: Record<string, Record<string, Video[]>> = {};
+  for (const video of filtered) {
+    const classKey = video.classLevel || "Unknown Class";
+    const subjectKey = video.subject || "Unknown Subject";
+    if (!groupedVideos[classKey]) groupedVideos[classKey] = {};
+    if (!groupedVideos[classKey][subjectKey]) groupedVideos[classKey][subjectKey] = [];
+    groupedVideos[classKey][subjectKey].push(video);
+  }
 
   return (
-    <main className="max-w-6xl mx-auto py-16 px-4 space-y-8">
-      <h1 className="text-3xl font-bold text-center">Class-wise Video Lectures</h1>
+    <main className="max-w-7xl mx-auto py-12 px-4 space-y-10">
+      <h1 className="text-3xl font-bold text-center">🎓 Class & Subject-wise Video Lectures</h1>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4 justify-center">
-        <select
-          value={selectedClass}
-          onChange={(e) => setSelectedClass(e.target.value)}
-          className="px-4 py-2 border rounded-md"
-        >
-          <option value="">All Classes</option>
-          {classOptions.map((cls) => (
-            <option key={cls} value={cls}>{cls}</option>
-          ))}
-        </select>
-
-        <select
-          value={selectedSubject}
-          onChange={(e) => setSelectedSubject(e.target.value)}
-          className="px-4 py-2 border rounded-md"
-        >
-          <option value="">All Subjects</option>
-          {subjectOptions.map((subj) => (
-            <option key={subj} value={subj}>{subj}</option>
-          ))}
-        </select>
-
+      {/* 🔍 Search Bar */}
+      <div className="flex justify-center">
         <input
           type="text"
-          placeholder="Search by title..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="px-4 py-2 border rounded-md w-64"
+          placeholder="Search by title..."
+          className="px-4 py-2 border rounded-md w-full max-w-md"
         />
       </div>
 
-      {/* Grid or Loader */}
+      {/* 📺 Lecture Grid */}
       {loading ? (
         <SkeletonGrid />
+      ) : Object.keys(groupedVideos).length === 0 ? (
+        <p className="text-center text-gray-500">No videos found.</p>
       ) : (
-        <VideoLectureGrid videos={filteredVideos} />
+        <VideoLectureGrid groupedVideos={groupedVideos} />
       )}
     </main>
   );

@@ -3,77 +3,35 @@
 import { useState } from "react";
 import { Video } from "@/types/video";
 import VideoCard from "./VideoCard";
-import VideoPlaylistModal from "./VideoPlaylistModal";
 
-export default function VideoLectureGrid({ videos }: { videos: Video[] }) {
-  const [classFilter, setClassFilter] = useState("All");
-  const [subjectFilter, setSubjectFilter] = useState("All");
-
-  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
-
-  const classOptions = Array.from(
-    new Set(videos.map((v) => v.classLevel ?? "Unknown"))
-  );
-  const subjectOptions = Array.from(
-    new Set(videos.map((v) => v.subject))
-  );
-
-  const filtered = videos.filter(
-    (v) =>
-      (classFilter === "All" || v.classLevel === classFilter) &&
-      (subjectFilter === "All" || v.subject === subjectFilter)
-  );
-
+export default function VideoLectureGrid({ groupedVideos }: { groupedVideos: Record<string, Record<string, Video[]>> }) {
   return (
-    <div className="space-y-8">
-      {/* Filter Controls */}
-      <div className="flex flex-wrap justify-center gap-4">
-        <select
-          className="px-4 py-2 border rounded-md text-sm"
-          value={classFilter}
-          onChange={(e) => setClassFilter(e.target.value)}
-        >
-          <option value="All">All Classes</option>
-          {classOptions.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
+    <div className="space-y-6">
+      {Object.entries(groupedVideos).map(([classLevel, subjects]) => (
+        <details key={classLevel} open className="border rounded-md p-2">
+          <summary className="text-lg font-semibold text-indigo-800 cursor-pointer">
+            🏫 Class {classLevel}
+          </summary>
 
-        <select
-          className="px-4 py-2 border rounded-md text-sm"
-          value={subjectFilter}
-          onChange={(e) => setSubjectFilter(e.target.value)}
-        >
-          <option value="All">All Subjects</option>
-          {subjectOptions.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-      </div>
+          <div className="pl-4 mt-2 space-y-4">
+            {Object.entries(subjects).map(([subject, videos]) => (
+              <details key={subject} open className="bg-gray-50 rounded-md p-2">
+                <summary className="font-medium text-gray-800">
+                  📘 {subject}
+                </summary>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {filtered.map((video, idx) => (
-          <VideoCard
-            key={idx}
-            video={video}
-            onPlay={() => setSelectedVideo(video)}
-          />
-        ))}
-      </div>
-
-      {/* Playlist Modal */}
-      {selectedVideo && (
-        <VideoPlaylistModal
-          videos={filtered}
-          initialVideo={selectedVideo}
-          onClose={() => setSelectedVideo(null)}
-        />
-      )}
+                <div className="mt-2 flex gap-4 flex-wrap">
+                  {videos.map((video) => (
+                    <div key={video.id} className="w-full sm:w-[280px]">
+                      <VideoCard video={video} />
+                    </div>
+                  ))}
+                </div>
+              </details>
+            ))}
+          </div>
+        </details>
+      ))}
     </div>
   );
 }

@@ -1,12 +1,14 @@
-import { fetchHomepage, fetchAbout, fetchPrograms } from "@/lib/strapi";
+import { fetchHomepage, fetchAbout, fetchPrograms, fetchTopVideos } from "@/lib/strapi";
 import AboutSection from "@/components/AboutSection";
 import ProgramSection from "@/components/ProgramSection";
+import CarouselVideoSection from "@/components/CarouselVideoSection";
 
 export default async function HomePage() {
-  const [homepage, about, programs] = await Promise.all([
+  const [homepage, about, programs, topVideos] = await Promise.all([
     fetchHomepage(),
     fetchAbout(),
     fetchPrograms(),
+    fetchTopVideos(),
   ]);
 
   if (!homepage) {
@@ -23,7 +25,7 @@ export default async function HomePage() {
 
   return (
     <main className="space-y-24 scroll-smooth">
-      {/* Hero Section */}
+      {/* 🎯 Hero Section */}
       <section className="max-w-5xl mx-auto px-4 py-12 text-center space-y-6">
         <h1 className="text-4xl font-extrabold">{homepage.title}</h1>
         <p className="text-gray-700 text-lg">{homepage.description}</p>
@@ -54,10 +56,15 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Programs Section */}
+      {/* 🔥 Top Educational Videos Carousel */}
+      {topVideos && topVideos.length > 0 && (
+        <CarouselVideoSection videos={topVideos} />
+      )}
+
+      {/* 🎓 Programs Section */}
       <ProgramSection programs={programs} />
 
-      {/* About Section Preview */}
+      {/* 🧠 About Section */}
       {about?.leftText && about?.rightText && (
         <AboutSection
           title={about.title}

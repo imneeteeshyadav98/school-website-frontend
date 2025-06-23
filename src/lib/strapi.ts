@@ -245,13 +245,12 @@ export async function fetchProgramBySlug(slug: string) {
 }
 
 
-
   export async function fetchVideoLectures(): Promise<Video[]> {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/video-lectures?populate=thumbnail`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/video-lectures?populate=*`, {
         next: { revalidate: 60 },
       });
-  
+      console.log(res)
       if (!res.ok) {
         console.error("❌ Failed to fetch videos:", res.statusText);
         return [];
@@ -307,4 +306,72 @@ export async function fetchProgramBySlug(slug: string) {
       return [];
     }
   }
+  
+
+
+
+
+  // import { Video } from '@/types/video';
+
+  export function parseVideo(entry: any): Video {
+    const { id, attributes } = entry;
+  
+    return {
+      id,
+      title: attributes.title,
+      youtubeUrl: attributes.youtubeUrl,
+      subject: attributes.subject || 'Unknown',
+      topic: attributes.topic || '',
+      classLevel: attributes.classLevel || 'Unknown',
+      duration: attributes.duration || '',
+      publishedAt: attributes.publishedAt,
+      // Add any other fields you're using
+    };
+  }
+
+  export async function fetchTopVideos(): Promise<Video[]> {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/homepage-setting?populate[top_videos][populate]=*`, {
+        cache: "no-store",
+      });
+  
+      console.log("Data Response", res);
+  
+      if (!res.ok) {
+        console.error("❌ Failed to fetch top videos:", res.statusText);
+        return [];
+      }
+  
+      const json = await res.json();
+      console.log("Parsed JSON", json);
+  
+      const videosData = json?.data?.top_videos;
+      console.log("Videos Data", videosData);
+  
+      if (!Array.isArray(videosData)) {
+        console.warn("⚠️ top_videos relation not an array.");
+        return [];
+      }
+  
+      return videosData.map((entry: any) => ({
+        id: entry.id,
+        title: entry.title || '',
+        youtubeUrl: entry.youtubeUrl || '',
+        subject: entry.subject || 'Unknown',
+        topic: entry.topic || '',
+        classLevel: entry.classLevel || 'Unknown',
+        duration: entry.duration || '',
+        publishedAt: entry.publishedAt || '',
+        thumbnail: entry.thumbnail?.url
+          ? { url: `${process.env.NEXT_PUBLIC_STRAPI_URL}${entry.thumbnail.url}` }
+          : undefined,
+      }));
+    } catch (error) {
+      console.error("❌ Error fetching top videos:", error);
+      return [];
+    }
+  }
+  
+  
+  
   

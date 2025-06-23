@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -26,49 +26,35 @@ function extractYouTubeId(url: string): string | null {
 export default function CarouselVideoSection({ videos }: Props) {
   const [isClient, setIsClient] = useState(false);
   const [activeVideo, setActiveVideo] = useState<Video | null>(null);
-  const [hoveredVideoId, setHoveredVideoId] = useState<string | null>(null);
-  const [soundEnabledMap, setSoundEnabledMap] = useState<Record<string, boolean>>({});
-  const [expandedVideoId, setExpandedVideoId] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  const handleFullscreen = (id: string) => {
-    const element = document.getElementById(`video-${id}`);
-    if (element?.requestFullscreen) {
-      element.requestFullscreen();
-    }
-  };
-
-  const handleSoundToggle = (id: string) => {
-    setSoundEnabledMap((prev) => ({
-      ...Object.fromEntries(Object.entries(prev).map(([k]) => [k, false])),
-      [id]: !prev[id],
-    }));
-  };
 
   const handleOpenModal = (video: Video) => {
     setActiveVideo(video);
   };
 
   return (
-    <section className="py-10 px-4 bg-gray-50">
-      <h2 className="text-2xl font-bold mb-6 text-center">🔥 Top Educational Videos</h2>
+    <section className="py-10 px-4">
+      <h2 className="text-3xl font-bold mb-4 px-2 flex items-center gap-2">
+        <span>🔥</span> <span>Top Educational Videos</span>
+      </h2>
 
       {videos.length === 0 ? (
         <p className="text-center text-red-500">⚠️ No videos available.</p>
       ) : (
         <Swiper
           slidesPerView={1.2}
-          spaceBetween={20}
+          spaceBetween={16}
           autoplay={{ delay: 4000 }}
           breakpoints={{
-            640: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
+            640: { slidesPerView: 2.2 },
+            1024: { slidesPerView: 4.5 },
           }}
           navigation
           modules={[Autoplay, Navigation]}
+          className="overflow-visible" // allow pop-out
         >
           {videos.map((video) => {
             const id = extractYouTubeId(video.youtubeUrl);
@@ -76,81 +62,34 @@ export default function CarouselVideoSection({ videos }: Props) {
 
             const fallbackThumbnail = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
             const finalThumbnail = video.thumbnail?.url || fallbackThumbnail;
-            const isHovered = hoveredVideoId === id;
-            const isExpanded = expandedVideoId === id;
-            const isSoundOn = soundEnabledMap[id] ?? false;
 
             return (
-              <SwiperSlide key={video.id}>
-                <div
-                  className="cursor-pointer group rounded-lg overflow-hidden shadow-lg transition-transform transform hover:scale-105 relative"
-                  onMouseEnter={() => setHoveredVideoId(id)}
-                  onMouseLeave={() => {
-                    setHoveredVideoId(null);
-                    setExpandedVideoId(null);
-                  }}
-                >
-                  <div
-                    id={`video-${id}`}
-                    className={`relative w-full ${isExpanded ? 'h-72' : 'h-48'} transition-all duration-500 overflow-hidden bg-black`}
-                  >
-                    <img
-                      src={finalThumbnail}
-                      alt={video.title}
-                      className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0"
-                    />
-
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                      <iframe
-                        className="w-full h-full"
-                        src={`https://www.youtube.com/embed/${id}?autoplay=1&mute=${isSoundOn ? '0' : '1'}&controls=0&loop=1&playlist=${id}&modestbranding=1`}
-                        title={video.title}
-                        allow="autoplay; encrypted-media"
-                        allowFullScreen
+              <SwiperSlide key={video.id} className="overflow-visible">
+                <div className="relative group">
+                  <div className="relative rounded-lg overflow-hidden bg-white shadow transition-all duration-300 ease-in-out transform group-hover:z-50 group-hover:scale-110 group-hover:shadow-2xl">
+                    <div
+                      className="relative w-full h-60 overflow-hidden cursor-pointer"
+                      onClick={() => handleOpenModal(video)}
+                    >
+                      <img
+                        src={finalThumbnail}
+                        alt={video.title}
+                        className="w-full h-full object-cover group-hover:opacity-80 transition-opacity duration-300"
                       />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button className="text-white text-4xl bg-black bg-opacity-70 p-3 rounded-full">▶️</button>
+                      </div>
+                      <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded font-semibold tracking-wide shadow-md">
+                        NEW
+                      </div>
                     </div>
 
-                    {/* Controls */}
-                    {isHovered && (
-                      <div className="absolute bottom-2 right-2 z-10 flex gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSoundToggle(id);
-                          }}
-                          title={isSoundOn ? 'Mute' : 'Unmute'}
-                          className="bg-black bg-opacity-60 text-white px-2 py-1 text-xs rounded hover:bg-opacity-80"
-                        >
-                          {isSoundOn ? '🔊' : '🔇'}
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setExpandedVideoId(isExpanded ? null : id);
-                          }}
-                          className="bg-black bg-opacity-60 text-white px-2 py-1 text-xs rounded hover:bg-opacity-80"
-                        >
-                          {isExpanded ? 'Collapse' : 'Expand'}
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleFullscreen(id);
-                          }}
-                          title="Fullscreen"
-                          className="bg-black bg-opacity-60 text-white px-2 py-1 text-xs rounded hover:bg-opacity-80"
-                        >
-                          ⛶
-                        </button>
+                    <div className="bg-gray-100 text-gray-800 px-3 py-2 text-sm transition-all">
+                      <div className="font-semibold truncate">{video.title}</div>
+                      <div className="opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-24 overflow-hidden text-xs text-gray-600 transition-all duration-300 ease-in-out">
+                        {/* {video.description?.slice(0, 100) || 'No description available.'} */}
                       </div>
-                    )}
-                  </div>
-
-                  <div
-                    className="bg-gray-900 text-white text-sm font-medium px-3 py-2 truncate"
-                    onClick={() => handleOpenModal(video)}
-                  >
-                    {video.title}
+                    </div>
                   </div>
                 </div>
               </SwiperSlide>

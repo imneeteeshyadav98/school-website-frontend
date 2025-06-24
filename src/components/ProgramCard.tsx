@@ -3,6 +3,7 @@
 import React from "react";
 import clsx from "clsx";
 import Link from "next/link";
+import Image from "next/image"; // ✅ Import next/image
 import { motion, type Variants } from "framer-motion";
 
 type Program = {
@@ -57,10 +58,7 @@ export default function ProgramCard({ program }: { program: Program }) {
         borderClass
       )}
     >
-      <Link
-        href={`/programs/${program.slug}`}
-        className="block w-full h-full"
-      >
+      <Link href={`/programs/${program.slug}`} className="block w-full h-full">
         <span
           className={clsx(
             "inline-block text-xs font-medium px-3 py-1 rounded-full mb-3",
@@ -71,15 +69,22 @@ export default function ProgramCard({ program }: { program: Program }) {
         </span>
 
         {program.icon && (
-          <img
-            src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${program.icon}`}
-            alt={program.title}
-            className="h-14 w-14 object-contain mb-4"
-          />
+          <div className="relative h-14 w-14 mb-4">
+            <Image
+              src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${program.icon}`}
+              alt={program.title}
+              fill
+              unoptimized
+              className="object-contain"
+              sizes="56px"
+            />
+          </div>
         )}
 
         <h3 className="text-lg font-semibold mb-1">{program.title}</h3>
-        <p className="text-gray-600 text-sm line-clamp-4">{program.description}</p>
+        <p className="text-gray-600 text-sm line-clamp-4">
+          {program.description}
+        </p>
 
         <span className="mt-4 inline-block text-blue-600 hover:underline font-medium">
           Learn More →

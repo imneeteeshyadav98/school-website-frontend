@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Video } from "@/types/video";
 
 export default function VideoCard({ video }: { video: Video }) {
@@ -37,26 +38,27 @@ export default function VideoCard({ video }: { video: Video }) {
       })
     : null;
 
-  // Logic for badges
   const isNew = publishedAt
     ? Date.now() - new Date(publishedAt).getTime() < 7 * 24 * 60 * 60 * 1000
     : false;
+
   const isPopular = duration && parseInt(duration) >= 20;
 
   return (
     <div className="rounded-lg overflow-hidden shadow hover:shadow-lg transition border border-gray-200 bg-white">
       {/* Thumbnail */}
       <a href={youtubeUrl} target="_blank" rel="noopener noreferrer">
-        <div className="relative">
-          <img
+        <div className="relative aspect-video w-full">
+          <Image
             src={thumbnailUrl}
             alt={title}
-            loading="lazy"
-            className="w-full aspect-video object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+            className="object-cover"
           />
 
-          {/* Badges over thumbnail */}
-          <div className="absolute top-2 left-2 flex gap-2">
+          {/* Badges */}
+          <div className="absolute top-2 left-2 flex gap-2 z-10">
             {isNew && (
               <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full shadow">
                 🆕 New

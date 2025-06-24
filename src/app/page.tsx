@@ -99,8 +99,8 @@ export default async function HomePage() {
           title={about.title}
           leftText={about.leftText}
           rightText={about.rightText}
-          ctaText={about.ctaText}
-          ctaLink={about.ctaLink}
+          // ctaText={about.ctaText}
+          // ctaLink={about.ctaLink}
           coreValues={about.coreValues}
         />
       )}

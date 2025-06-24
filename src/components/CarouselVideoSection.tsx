@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image'; // ✅ Import next/image
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -57,12 +58,14 @@ export default function CarouselVideoSection({ videos }: Props) {
               frameBorder="0"
               allow="autoplay; encrypted-media"
               allowFullScreen
-            ></iframe>
+            />
           ) : (
-            <img
+            <Image
               src={thumbnail}
               alt={video.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
             />
           )}
 

@@ -18,8 +18,6 @@ export default async function AboutPage() {
         title={about.title}
         leftText={about.leftText}
         rightText={about.rightText}
-        ctaText={about.ctaText}
-        ctaLink={about.ctaLink}
         coreValues={about.coreValues}
         highlightStats={about.highlightStats}
         timeline={about.timeline}

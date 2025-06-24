@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from "framer-motion";
+import Image from "next/image"; // ✅ Import Image
 
 type PrincipalSectionProps = {
   principalName?: string;
@@ -30,11 +31,16 @@ export default function PrincipalSection({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         {principalPhoto && (
           <figure className="text-center">
-            <img
-              src={principalPhoto}
-              alt={`Photo of ${principalName || "Principal"}`}
-              className="rounded-full shadow-lg object-cover w-56 h-56 md:w-64 md:h-64 mx-auto border-4 border-blue-100"
-            />
+            <div className="relative w-56 h-56 md:w-64 md:h-64 mx-auto">
+              <Image
+                src={principalPhoto}
+                alt={`Photo of ${principalName || "Principal"}`}
+                fill
+                unoptimized
+                className="rounded-full shadow-lg object-cover border-4 border-blue-100"
+                sizes="(max-width: 768px) 224px, 256px"
+              />
+            </div>
             {principalName && (
               <figcaption className="mt-4">
                 <p className="text-xl font-semibold text-gray-800">{principalName}</p>

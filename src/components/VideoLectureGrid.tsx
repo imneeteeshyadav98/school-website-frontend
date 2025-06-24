@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Video } from "@/types/video";
 import VideoCard from "./VideoCard";
 

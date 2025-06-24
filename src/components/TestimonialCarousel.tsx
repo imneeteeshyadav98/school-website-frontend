@@ -20,9 +20,7 @@ function StarRating({ rating }: { rating: number }) {
       {[...Array(5)].map((_, idx) => (
         <svg
           key={idx}
-          className={`w-5 h-5 ${
-            idx < rating ? 'text-yellow-400' : 'text-gray-300'
-          }`}
+          className={`w-5 h-5 ${idx < rating ? 'text-yellow-400' : 'text-gray-300'}`}
           fill="currentColor"
           viewBox="0 0 20 20"
           aria-hidden="true"
@@ -76,7 +74,9 @@ export default function TestimonialCarousel({ testimonial = [] }: { testimonial:
               )}
 
               {/* Quote */}
-              <p className="italic text-gray-600 mb-3 line-clamp-4">"{item.message}"</p>
+              <p className="italic text-gray-600 mb-3 line-clamp-4">
+                &ldquo;{item.message}&rdquo;
+              </p>
 
               {/* Ratings */}
               <StarRating rating={item.rating} />

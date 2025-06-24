@@ -1,8 +1,7 @@
-// components/HoverPreviewCard.tsx
-
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
+import Image from "next/image";
 import { Video } from "@/types/video";
 
 export default function HoverPreviewCard({
@@ -32,10 +31,13 @@ export default function HoverPreviewCard({
     >
       {/* Thumbnail */}
       {!showPreview && (
-        <img
+        <Image
           src={thumbnail}
           alt={video.title}
-          className="w-full h-full object-cover transition-opacity"
+          fill
+          unoptimized
+          className="object-cover transition-opacity"
+          sizes="(max-width: 768px) 100vw, 320px"
         />
       )}
 

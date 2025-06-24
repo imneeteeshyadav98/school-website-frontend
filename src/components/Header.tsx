@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import Image from 'next/image'; // ✅ Import next/image
 import { fetchLogo } from '@/lib/strapi';
 
 export default function Header() {
@@ -18,7 +19,14 @@ export default function Header() {
         {/* Logo + Name */}
         <Link href="/" className="text-lg font-bold text-blue-700 flex items-center gap-2">
           {logoUrl ? (
-            <img src={logoUrl} alt="Logo" className="h-8 w-8 object-contain" />
+            <Image
+              src={logoUrl}
+              alt="Logo"
+              width={32}
+              height={32}
+              unoptimized // ✅ External CMS logo
+              className="h-8 w-8 object-contain"
+            />
           ) : (
             <span>Loading...</span>
           )}

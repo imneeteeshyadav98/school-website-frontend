@@ -187,12 +187,14 @@ export default function GallerySection({ items }: Props) {
         >
           <button onClick={closeLightbox} className="absolute top-4 right-4 text-white text-2xl">✕</button>
           <button onClick={prevPhoto} className="absolute left-4 text-white text-3xl p-2" disabled={lightbox.index === 0}>⟨</button>
-          <div className="flex items-center justify-center max-w-[90%] max-h-[90vh]">
-            <img
+          <div className="relative w-[90vw] h-[90vh] max-w-[90%] max-h-[90vh]">
+            <Image
               src={lightbox.photos[lightbox.index]}
               alt="Preview"
-              className="max-h-[90vh] object-contain rounded shadow-lg animate-fade"
-              loading="lazy"
+              fill
+              unoptimized
+              className="object-contain rounded shadow-lg animate-fade"
+              sizes="(max-width: 768px) 100vw, 90vw"
             />
           </div>
           <div className="absolute top-4 left-4 text-white bg-black bg-opacity-50 px-2 py-1 rounded text-sm">

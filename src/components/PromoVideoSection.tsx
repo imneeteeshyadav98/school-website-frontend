@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 
 type PromoVideoSectionProps = {
   videoUrl: string;
@@ -29,14 +30,13 @@ export default function PromoVideoSection({
 
   const embedURL = `https://www.youtube-nocookie.com/embed/${videoID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoID}&modestbranding=1`;
 
+  const thumbSrc = isYouTube
+    ? `https://img.youtube.com/vi/${videoID}/hqdefault.jpg`
+    : videoThumb || '/default-thumb.jpg';
+
   return (
-    <section
-      id="campus-tour"
-      className="py-12 px-4 sm:px-6"
-    >
-      <h3 className="text-3xl font-bold text-center text-gray-800 mb-8">
-        🎬 Campus Tour
-      </h3>
+    <section id="campus-tour" className="py-12 px-4 sm:px-6">
+      <h3 className="text-3xl font-bold text-center text-gray-800 mb-8">🎬 Campus Tour</h3>
 
       <div className="flex justify-center">
         <a
@@ -59,15 +59,15 @@ export default function PromoVideoSection({
               allowFullScreen
             />
           ) : (
-            <img
-              src={
-                isYouTube
-                  ? `https://img.youtube.com/vi/${videoID}/hqdefault.jpg`
-                  : videoThumb || '/default-thumb.jpg'
-              }
-              alt="Campus Tour"
-              className="w-full h-full object-cover transition duration-300 ease-in-out group-hover:blur-sm group-hover:scale-105"
-            />
+            <div className="absolute top-0 left-0 w-full h-full">
+              <Image
+                src={thumbSrc}
+                alt="Campus Tour"
+                fill
+                unoptimized
+                className="object-cover transition duration-300 ease-in-out group-hover:blur-sm group-hover:scale-105"
+              />
+            </div>
           )}
 
           {/* Play icon overlay */}

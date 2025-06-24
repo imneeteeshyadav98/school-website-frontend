@@ -1,7 +1,7 @@
+
+
 import axios from 'axios';
 import { marked } from "marked";
-import { collectSegmentData } from 'next/dist/server/app-render/collect-segment-data';
-import { title } from 'process';
 import { Video } from "../types/video";
 const baseURL = process.env.NEXT_PUBLIC_STRAPI_URL;
 const token = process.env.STRAPI_API_TOKEN;
@@ -188,7 +188,6 @@ export const fetchHomepage = async () => {
     }
   };
   
-// lib/strapi.ts
 export async function fetchPrograms() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/programs?populate=icon`, {
     cache: "no-store",
@@ -307,12 +306,6 @@ export async function fetchProgramBySlug(slug: string) {
     }
   }
   
-
-
-
-
-  // import { Video } from '@/types/video';
-
   export function parseVideo(entry: any): Video {
     const { id, attributes } = entry;
   
@@ -325,7 +318,6 @@ export async function fetchProgramBySlug(slug: string) {
       classLevel: attributes.classLevel || 'Unknown',
       duration: attributes.duration || '',
       publishedAt: attributes.publishedAt,
-      // Add any other fields you're using
     };
   }
 

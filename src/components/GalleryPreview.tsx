@@ -36,6 +36,7 @@ export default function GalleryPreview({ items }: Props) {
                   alt={photo.title}
                   fill
                   className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+                  unoptimized // ✅ because it's dynamic and possibly external
                 />
               </div>
               <div className="bg-black text-white text-sm text-center px-2 py-1 truncate">
@@ -44,7 +45,6 @@ export default function GalleryPreview({ items }: Props) {
             </div>
           ))}
         </div>
-
       </section>
 
       {lightboxIndex !== null && (
@@ -55,11 +55,16 @@ export default function GalleryPreview({ items }: Props) {
           >
             ×
           </button>
-          <img
-            src={previewPhotos[lightboxIndex].url}
-            alt="Preview"
-            className="max-h-[90vh] object-contain rounded shadow-lg"
-          />
+          <div className="relative w-[90vw] h-[90vh]">
+            <Image
+              src={previewPhotos[lightboxIndex].url}
+              alt="Preview"
+              fill
+              className="object-contain rounded shadow-lg"
+              unoptimized
+              sizes="(max-width: 768px) 100vw, 90vw"
+            />
+          </div>
         </div>
       )}
     </>

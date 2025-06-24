@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import Image from 'next/image'; // ✅ Import next/image
 import { fetchLogo } from '@/lib/strapi';
 import { FaFacebookF, FaYoutube } from 'react-icons/fa';
 
@@ -19,7 +20,14 @@ export default function Footer() {
         <div>
           <Link href="/" className="flex items-center gap-2 mb-3">
             {logoUrl ? (
-              <img src={logoUrl} alt="Logo" className="h-8 w-8 object-contain" />
+              <Image
+                src={logoUrl}
+                alt="Logo"
+                width={32}
+                height={32}
+                unoptimized // ✅ necessary for external dynamic images (e.g., from CMS)
+                className="h-8 w-8 object-contain"
+              />
             ) : (
               <span className="font-bold text-xl text-blue-700">BRS</span>
             )}

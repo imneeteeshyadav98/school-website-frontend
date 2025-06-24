@@ -15,7 +15,7 @@ export default function PromoVideoSection({
   videoThumb,
   videoType,
 }: PromoVideoSectionProps) {
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   if (!videoUrl?.startsWith('http')) return null;
 
@@ -27,85 +27,63 @@ export default function PromoVideoSection({
     ? videoUrl.split('watch?v=')[1]
     : videoUrl.split('/').pop() || '';
 
-  const embedURL = `https://www.youtube-nocookie.com/embed/${videoID}?autoplay=1&mute=1&loop=1&controls=1&playlist=${videoID}`;
-
-  const openModal = () => setModalOpen(true);
-  const closeModal = () => setModalOpen(false);
+  const embedURL = `https://www.youtube-nocookie.com/embed/${videoID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoID}&modestbranding=1`;
 
   return (
     <section
       id="campus-tour"
-      className="relative text-center bg-gray-50 py-12 px-4 sm:px-6 rounded-lg shadow-inner"
+      className="py-12 px-4 sm:px-6"
     >
-      <h3 className="text-2xl font-semibold text-gray-800 mb-4">Campus Tour</h3>
+      <h3 className="text-3xl font-bold text-center text-gray-800 mb-8">
+        🎬 Campus Tour
+      </h3>
 
-      <div className="relative w-full max-w-3xl mx-auto aspect-video rounded-xl overflow-hidden shadow-lg group">
-        {/* Overlay Play Button */}
-        <button
-          onClick={openModal}
-          className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 text-white group-hover:bg-black/60 transition"
-          aria-label="Play Video"
+      <div className="flex justify-center">
+        <a
+          href={videoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative block w-full max-w-4xl aspect-video rounded-xl overflow-hidden shadow-lg group transform transition-transform duration-300 hover:scale-[1.04]"
+          aria-label="Watch Campus Tour"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
-          <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 84 84">
-            <circle cx="42" cy="42" r="42" fill="rgba(0,0,0,0.6)" />
-            <polygon points="33,25 60,42 33,59" fill="white" />
-          </svg>
-        </button>
+          {/* Hover video preview */}
+          {isYouTube && isHovered ? (
+            <iframe
+              src={embedURL}
+              title="Campus Tour Preview"
+              className="absolute top-0 left-0 w-full h-full"
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            />
+          ) : (
+            <img
+              src={
+                isYouTube
+                  ? `https://img.youtube.com/vi/${videoID}/hqdefault.jpg`
+                  : videoThumb || '/default-thumb.jpg'
+              }
+              alt="Campus Tour"
+              className="w-full h-full object-cover transition duration-300 ease-in-out group-hover:blur-sm group-hover:scale-105"
+            />
+          )}
 
-        {/* Thumbnail */}
-        <img
-          src={
-            isYouTube
-              ? `https://img.youtube.com/vi/${videoID}/hqdefault.jpg`
-              : videoThumb || '/default-thumb.jpg'
-          }
-          alt="Video Thumbnail"
-          className="w-full h-full object-cover"
-        />
+          {/* Play icon overlay */}
+          {!isHovered && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition z-10">
+              <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 84 84">
+                <circle cx="42" cy="42" r="42" fill="rgba(0,0,0,0.6)" />
+                <polygon points="33,25 60,42 33,59" fill="white" />
+              </svg>
+            </div>
+          )}
+        </a>
       </div>
 
-      {videoTitle && <p className="text-sm text-gray-600 mt-4">{videoTitle}</p>}
-
-      {/* Modal Overlay */}
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center px-4"
-          role="dialog"
-          aria-modal="true"
-          onClick={closeModal}
-        >
-          <div
-            className="relative w-full max-w-4xl bg-black rounded-xl overflow-hidden aspect-video"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={closeModal}
-              className="absolute top-2 right-2 z-10 text-white bg-black/50 hover:bg-black/80 p-2 rounded"
-              aria-label="Close"
-            >
-              ✕
-            </button>
-
-            {isYouTube ? (
-              <iframe
-                src={embedURL}
-                title="Campus Tour"
-                className="w-full h-full"
-                frameBorder="0"
-                allow="autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-              <video
-                src={videoUrl}
-                controls
-                autoPlay
-                className="w-full h-full"
-                poster={videoThumb || undefined}
-              />
-            )}
-          </div>
-        </div>
+      {videoTitle && (
+        <p className="text-center text-gray-600 mt-4 text-base italic">{videoTitle}</p>
       )}
     </section>
   );

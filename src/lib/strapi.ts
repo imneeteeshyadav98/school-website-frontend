@@ -335,7 +335,7 @@ export async function fetchProgramBySlug(slug: string) {
         cache: "no-store",
       });
   
-      console.log("Data Response", res);
+      console.log("Top Videos", res);
   
       if (!res.ok) {
         console.error("❌ Failed to fetch top videos:", res.statusText);

@@ -25,6 +25,8 @@ function extractYouTubeId(url: string): string | null {
 
 export default function CarouselVideoSection({ videos }: Props) {
   const [activeVideo, setActiveVideo] = useState<Video | null>(null);
+  const [hoveredVideoId, setHoveredVideoId] = useState<number | null>(null);
+
   const handleOpenModal = (video: Video) => setActiveVideo(video);
 
   const renderVideoCard = (video: Video) => {
@@ -36,52 +38,65 @@ export default function CarouselVideoSection({ videos }: Props) {
       video.publishedAt &&
       Date.now() - new Date(video.publishedAt).getTime() < 7 * 24 * 60 * 60 * 1000;
 
+    const isHovered = hoveredVideoId === video.id;
+
     return (
       <div
         key={video.id}
-        className="w-full max-w-[260px] relative group cursor-pointer"
+        className="w-full max-w-[320px] relative group cursor-pointer"
         onClick={() => handleOpenModal(video)}
+        onMouseEnter={() => setHoveredVideoId(video.id)}
+        onMouseLeave={() => setHoveredVideoId(null)}
       >
-        <div className="rounded-lg overflow-hidden bg-white shadow transition-all duration-300 ease-in-out transform group-hover:z-50 group-hover:scale-110 group-hover:shadow-2xl">
-          {/* Thumbnail */}
-          <div className="relative w-full h-60 overflow-hidden">
+        <div className="rounded-lg overflow-hidden bg-white shadow transition-all duration-300 ease-in-out transform group-hover:z-50 group-hover:scale-110 group-hover:shadow-2xl relative h-72">
+          {isHovered ? (
+            <iframe
+              className="absolute top-0 left-0 w-full h-full"
+              src={`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1`}
+              title={video.title}
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            ></iframe>
+          ) : (
             <img
               src={thumbnail}
               alt={video.title}
-              className="w-full h-full object-cover group-hover:opacity-80 transition-opacity duration-300"
+              className="w-full h-full object-cover"
             />
-            {/* Play Overlay */}
+          )}
+
+          {!isHovered && (
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
               <span className="text-white text-4xl bg-black bg-opacity-60 p-3 rounded-full">▶️</span>
             </div>
-            {/* NEW badge */}
-            {isNew && (
-              <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded font-semibold tracking-wide shadow-md z-30">
-                NEW
-              </div>
-            )}
-          </div>
+          )}
 
-          {/* Title and Tags */}
-          <div className="bg-gray-100 text-gray-800 px-3 py-2 text-sm">
-            <div className="font-semibold truncate">{video.title}</div>
-            <div className="flex flex-wrap gap-1 mt-1 text-xs text-gray-600">
-              {video.classLevel && (
-                <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                  Class {video.classLevel}
-                </span>
-              )}
-              {video.subject && (
-                <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
-                  {video.subject}
-                </span>
-              )}
-              {video.duration && (
-                <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
-                  ⏱ {video.duration}
-                </span>
-              )}
+          {isNew && (
+            <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded font-semibold tracking-wide shadow-md z-30">
+              NEW
             </div>
+          )}
+        </div>
+
+        <div className="bg-gray-100 text-gray-800 px-3 py-2 text-sm">
+          <div className="font-semibold truncate">{video.title}</div>
+          <div className="flex flex-wrap gap-1 mt-1 text-xs text-gray-600">
+            {video.classLevel && (
+              <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                Class {video.classLevel}
+              </span>
+            )}
+            {video.subject && (
+              <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                {video.subject}
+              </span>
+            )}
+            {video.duration && (
+              <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
+                ⏱ {video.duration}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -102,16 +117,16 @@ export default function CarouselVideoSection({ videos }: Props) {
         </div>
       ) : (
         <Swiper
-          slidesPerView={5}
-          spaceBetween={16}
+          slidesPerView={4}
+          spaceBetween={20}
           autoplay={{ delay: 4000 }}
           navigation
           modules={[Autoplay, Navigation]}
           breakpoints={{
-            640: { slidesPerView: 2 },
-            768: { slidesPerView: 3 },
-            1024: { slidesPerView: 4 },
-            1280: { slidesPerView: 5 },
+            640: { slidesPerView: 1.5 },
+            768: { slidesPerView: 2.5 },
+            1024: { slidesPerView: 3.5 },
+            1280: { slidesPerView: 4.5 },
           }}
           className="overflow-visible"
         >

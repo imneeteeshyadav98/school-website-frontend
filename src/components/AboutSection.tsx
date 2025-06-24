@@ -1,8 +1,9 @@
+// src/components/AboutSection.tsx
+
 'use client';
 
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
 
 import CoreValuesGrid from './CoreValuesGrid';
 import VisionMission from './VisionMission';
@@ -11,11 +12,8 @@ import TimelineSection from './TimelineSection';
 import PrincipalSection from './PrincipalSection';
 import PromoVideoSection from './PromoVideoSection';
 import HighlightStatsGrid from './HighlightStatsGrid';
-import CTAButton from './CTAButton';
 import LocationMap from './LocationMap';
 import SectionWrapper from './SectionWrapper';
-import FloatingNav from './FloatingNav';
-
 
 const TestimonialCarousel = dynamic(() => import('./TestimonialCarousel'), { ssr: false });
 
@@ -26,75 +24,10 @@ const DangerousHTMLSection = ({ leftText, rightText }: { leftText: string; right
   </section>
 );
 
-// const SectionWrapper = ({
-//   index,
-//   children,
-//   className = '',
-//   id,
-// }: {
-//   index: number;
-//   children: React.ReactNode;
-//   className?: string;
-//   id?: string;
-// }) => {
-//   const bg = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
-//   return (
-//     <motion.section
-//       id={id}
-//       role="region"
-//       aria-labelledby={id ? `${id}-title` : undefined}
-//       initial={{ opacity: 0, y: 40 }}
-//       whileInView={{ opacity: 1, y: 0 }}
-//       viewport={{ once: true }}
-//       transition={{ duration: 0.6 }}
-//       className={`${bg} px-4 sm:px-6 py-16 ${className}`}
-//     >
-//       {children}
-//     </motion.section>
-//   );
-// };
-
-const FloatingCTA = ({ label, href }: { label: string; href: string }) => {
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setShow(window.scrollY > 400);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  return (
-    <a
-      href={href}
-      className={`fixed bottom-6 right-6 z-50 bg-blue-600 text-white px-5 py-3 rounded-full shadow-lg transition-opacity duration-300 ease-in-out hover:bg-blue-700 ${
-        show ? 'opacity-100' : 'opacity-0 pointer-events-none'
-      }`}
-    >
-      {label}
-    </a>
-  );
-};
-
-// const FloatingNav = () => (
-//   <nav className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-white shadow-md border rounded-full px-4 py-2 flex gap-3 z-40 text-sm sm:hidden">
-//     <a href="#about" className="text-blue-600 font-medium">About</a>
-//     <a href="#vision-mission" className="text-blue-600">Vision</a>
-//     <a href="#core-values" className="text-blue-600">Values</a>
-//     <a href="#principal" className="text-blue-600">Principal</a>
-//     <a href="#timeline" className="text-blue-600">Timeline</a>
-//     <a href="#campus-tour" className="text-blue-600">Tour</a>
-//     <a href="#faculty" className="text-blue-600">Faculty</a>
-//     <a href="#testimonials" className="text-blue-600">Reviews</a>
-//     <a href="#location" className="text-blue-600">Map</a>
-//   </nav>
-// );
-
 type AboutProps = {
   title?: string;
   leftText: string;
   rightText: string;
-  ctaText?: string;
-  ctaLink?: string;
   vision?: string;
   mission?: string;
   coreValues?: { icon: string; title: string; subtitle?: string }[];
@@ -124,8 +57,6 @@ export default function AboutSection({
   principalName,
   principalMessage,
   principalPhoto,
-  ctaText,
-  ctaLink,
   promoVideoURL,
   promoVideoTitle,
   promoVideoThumb,
@@ -214,19 +145,6 @@ export default function AboutSection({
           <LocationMap address={location.address} />
         </SectionWrapper>
       )}
-
-      {/* {ctaText && ctaLink && (
-        <SectionWrapper index={index++} className="bg-blue-50 text-center">
-          <CTAButton text={ctaText} link={ctaLink} />
-        </SectionWrapper>
-      )} */}
-
-      {/* {ctaText && ctaLink && (
-        <>
-          <FloatingCTA label={ctaText} href={ctaLink} />
-          <FloatingNav />
-        </>
-      )} */}
     </div>
   );
 }

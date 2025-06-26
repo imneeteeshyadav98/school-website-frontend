@@ -1,14 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image'; // ✅ Import next/image
-
-type FacultyMember = {
-  name: string;
-  designation: string;
-  photo: string;
-  bio: string;
-};
+import Image from 'next/image';
+import type { FacultyMember } from '@/lib/fetchFaculty';
 
 export default function FacultyCard({
   member,
@@ -17,32 +11,40 @@ export default function FacultyCard({
   member: FacultyMember;
   index: number;
 }) {
+  if (!member || typeof member !== 'object') return null;
+
+  const { name, designation, bio, photo } = member;
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ delay: index * 0.1, duration: 0.6 }}
-      className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center w-full max-w-sm mx-auto"
+      transition={{ delay: index * 0.1, duration: 0.5, ease: 'easeOut' }}
+      className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 w-full max-w-sm flex flex-col items-center text-center"
     >
-      {member.photo ? (
-        <div className="w-24 h-24 relative mb-4">
+      {photo ? (
+        <div className="w-28 h-28 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-sm relative">
           <Image
-            src={member.photo}
-            alt={member.name || 'Faculty'}
-            width={96}
-            height={96}
-            className="rounded-full object-cover border-2 border-blue-500"
+            src={photo}
+            alt={name || 'Faculty'}
+            fill
+            className="object-cover"
           />
         </div>
       ) : (
-        <div className="w-24 h-24 rounded-full bg-gray-200 mb-4 flex items-center justify-center text-gray-500 text-sm">
+        <div className="w-28 h-28 mb-4 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm shadow-inner">
           No Image
         </div>
       )}
-      <p className="text-lg font-bold text-gray-800">{member.name}</p>
-      <p className="text-sm text-blue-600">{member.designation}</p>
-      <p className="text-sm text-gray-600 mt-2 line-clamp-4">{member.bio}</p>
+
+      <h3 className="text-lg font-bold text-gray-900">{name || 'Unnamed'}</h3>
+      <p className="text-sm text-blue-600 font-medium mt-1">
+        {designation || 'Designation'}
+      </p>
+      <p className="text-sm text-gray-600 mt-2 leading-snug max-w-xs">
+        {typeof bio === 'string' ? bio : 'No bio available.'}
+      </p>
     </motion.div>
   );
 }

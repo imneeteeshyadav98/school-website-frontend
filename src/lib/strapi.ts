@@ -71,7 +71,7 @@ export const fetchHomepage = async () => {
   
   export const fetchAbout = async () => {
     try {
-      const res = await axios.get(`${baseURL}/api/about-uses?populate=*`, {
+      const res = await axios.get(`${baseURL}/api/about-uses?populate[FacultyHighlight][populate]=photo&populate=principalPhoto&populate[Testimonial][populate]=photo&populate[coreValues]=*&populate[timeline]=*&populate[LocationInfo]=*`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -85,6 +85,7 @@ export const fetchHomepage = async () => {
       }
   
       const item = items[0];
+      console.log("Pura records",item)
   
       const resolveImage = (imgObj: any): string | null =>
         imgObj?.url ? `${baseURL}${imgObj.url}` : null;
@@ -148,6 +149,7 @@ export const fetchHomepage = async () => {
         facultyHighlight: Array.isArray(item.FacultyHighlight)
           ? item.FacultyHighlight.map((f: any, i: number) => {
               const photo = resolveImage(f.photo);
+              console.log("photo",photo)
               console.log(`👨‍🏫 Faculty[${i}] Photo:`, photo);
               return {
                 name: f.name || "",

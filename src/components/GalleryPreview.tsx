@@ -28,18 +28,28 @@ export default function GalleryPreview({ items }: Props) {
             <div
               key={idx}
               onClick={() => setLightboxIndex(idx)}
-              className="rounded overflow-hidden shadow hover:shadow-lg transition cursor-pointer group"
+              className="relative rounded overflow-hidden shadow hover:shadow-lg transition cursor-pointer group bg-white aspect-[4/3]"
             >
-              <div className="relative aspect-[4/3] w-full">
-                <Image
-                  src={photo.url}
-                  alt={photo.title}
-                  fill
-                  className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-                  unoptimized // ✅ because it's dynamic and possibly external
-                />
-              </div>
-              <div className="bg-black text-white text-sm text-center px-2 py-1 truncate">
+              {/* Default Cropped Image */}
+              <Image
+                src={photo.url}
+                alt={photo.title}
+                fill
+                className="object-cover transition-opacity duration-300 ease-in-out group-hover:opacity-0"
+                unoptimized
+              />
+
+              {/* Full Image on Hover */}
+              <Image
+                src={photo.url}
+                alt={photo.title}
+                fill
+                className="object-contain absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out bg-white"
+                unoptimized
+              />
+
+              {/* Title */}
+              <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-80 text-black text-sm text-center px-2 py-1 truncate z-10">
                 {photo.title}
               </div>
             </div>
@@ -47,6 +57,7 @@ export default function GalleryPreview({ items }: Props) {
         </div>
       </section>
 
+      {/* Lightbox view on click */}
       {lightboxIndex !== null && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center">
           <button

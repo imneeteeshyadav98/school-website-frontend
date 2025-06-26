@@ -17,6 +17,7 @@ export default function PromoVideoSection({
   videoType,
 }: PromoVideoSectionProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [iframeError, setIframeError] = useState(false);
 
   if (!videoUrl?.startsWith('http')) return null;
 
@@ -24,11 +25,22 @@ export default function PromoVideoSection({
     videoType === 'youtube' ||
     (!videoType && (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')));
 
-  const videoID = videoUrl.includes('watch?v=')
-    ? videoUrl.split('watch?v=')[1]
-    : videoUrl.split('/').pop() || '';
+  const getYouTubeID = (url: string) => {
+    try {
+      const ytURL = new URL(url);
+      if (ytURL.hostname.includes('youtu.be')) return ytURL.pathname.slice(1);
+      if (ytURL.searchParams.get('v')) return ytURL.searchParams.get('v')!;
+      const parts = ytURL.pathname.split('/');
+      return parts[parts.length - 1];
+    } catch {
+      return '';
+    }
+  };
 
-  const embedURL = `https://www.youtube-nocookie.com/embed/${videoID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoID}&modestbranding=1`;
+  const videoID = isYouTube ? getYouTubeID(videoUrl) : '';
+  const embedURL = isYouTube
+    ? `https://www.youtube.com/embed/${videoID}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoID}&modestbranding=1`
+    : '';
 
   const thumbSrc = isYouTube
     ? `https://img.youtube.com/vi/${videoID}/hqdefault.jpg`
@@ -46,10 +58,13 @@ export default function PromoVideoSection({
           className="relative block w-full max-w-4xl aspect-video rounded-xl overflow-hidden shadow-lg group transform transition-transform duration-300 hover:scale-[1.04]"
           aria-label="Watch Campus Tour"
           onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          onMouseLeave={() => {
+            setIsHovered(false);
+            setIframeError(false);
+          }}
         >
-          {/* Hover video preview */}
-          {isYouTube && isHovered ? (
+          {/* Hover video preview or fallback to image */}
+          {isYouTube && isHovered && !iframeError ? (
             <iframe
               src={embedURL}
               title="Campus Tour Preview"
@@ -57,6 +72,7 @@ export default function PromoVideoSection({
               frameBorder="0"
               allow="autoplay; encrypted-media"
               allowFullScreen
+              onError={() => setIframeError(true)}
             />
           ) : (
             <div className="absolute top-0 left-0 w-full h-full">

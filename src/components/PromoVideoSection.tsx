@@ -51,19 +51,17 @@ export default function PromoVideoSection({
       <h3 className="text-3xl font-bold text-center text-gray-800 mb-8">🎬 Campus Tour</h3>
 
       <div className="flex justify-center">
-        <a
-          href={videoUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="relative block w-full max-w-4xl aspect-video rounded-xl overflow-hidden shadow-lg group transform transition-transform duration-300 hover:scale-[1.04]"
-          aria-label="Watch Campus Tour"
+        <div
+          className="relative block w-full max-w-4xl aspect-video rounded-xl overflow-hidden shadow-lg group transition-transform duration-300 hover:scale-[1.04] cursor-pointer"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => {
             setIsHovered(false);
             setIframeError(false);
           }}
+          onClick={() => window.open(videoUrl, '_blank')}
+          aria-label="Watch Campus Tour"
         >
-          {/* Hover video preview or fallback to image */}
+          {/* 🎞️ VIDEO PREVIEW */}
           {isYouTube && isHovered && !iframeError ? (
             <iframe
               src={embedURL}
@@ -74,19 +72,27 @@ export default function PromoVideoSection({
               allowFullScreen
               onError={() => setIframeError(true)}
             />
+          ) : videoType === 'file' ? (
+            <video
+              src={videoUrl}
+              muted
+              loop
+              autoPlay={isHovered}
+              playsInline
+              className="absolute top-0 left-0 w-full h-full object-cover"
+              onError={() => setIframeError(true)}
+            />
           ) : (
-            <div className="absolute top-0 left-0 w-full h-full">
-              <Image
-                src={thumbSrc}
-                alt="Campus Tour"
-                fill
-                unoptimized
-                className="object-cover transition duration-300 ease-in-out group-hover:blur-sm group-hover:scale-105"
-              />
-            </div>
+            <Image
+              src={thumbSrc}
+              alt="Campus Tour"
+              fill
+              unoptimized
+              className="object-cover transition duration-300 ease-in-out group-hover:blur-sm group-hover:scale-105"
+            />
           )}
 
-          {/* Play icon overlay */}
+          {/* ▶️ PLAY OVERLAY ICON */}
           {!isHovered && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition z-10">
               <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 84 84">
@@ -95,7 +101,7 @@ export default function PromoVideoSection({
               </svg>
             </div>
           )}
-        </a>
+        </div>
       </div>
 
       {videoTitle && (

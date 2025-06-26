@@ -4,6 +4,7 @@ import { GalleryItem } from "@/types/gallery";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 
+
 type Props = {
   items: GalleryItem[];
 };

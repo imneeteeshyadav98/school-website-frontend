@@ -1,8 +1,10 @@
 // src/app/faculty/page.tsx
+// pages/gallery/page.tsx or app/gallery/page.tsx
+export const dynamic = 'force-dynamic'; // ✅ this disables static optimization
 
 import FacultyCard from '@/components/FacultyCard';
 import { fetchFaculty } from '../..//lib/fetchFaculty';
-import type { FacultyMember } from '../../lib/fetchFaculty';
+// import type { FacultyMember } from '../../lib/fetchFaculty';
 
 import type { Metadata } from 'next';
 

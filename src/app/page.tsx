@@ -1,3 +1,6 @@
+// app/page.tsx
+export const dynamic = 'force-dynamic';
+
 import { fetchHomepage, fetchAbout, fetchPrograms, fetchTopVideos } from "@/lib/strapi";
 import AboutSection from "@/components/AboutSection";
 import ProgramSection from "@/components/ProgramSection";
